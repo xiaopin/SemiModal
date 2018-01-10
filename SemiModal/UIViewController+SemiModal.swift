@@ -30,6 +30,7 @@ extension UIViewController {
     ///   - completion:             模态窗口显示完毕时的回调
     @available(iOS 8.0, *)
     func presentSemiModalViewController(_ contentViewController: UIViewController, contentHeight: CGFloat, shouldDismissPopover: Bool, completion: (() -> Void)?) {
+        if let _ = presentedViewController { return }
         contentViewController.modalPresentationStyle = .custom
         contentViewController.preferredContentSize = CGSize(width: 0.0, height: contentHeight)
         
@@ -49,7 +50,7 @@ extension UIViewController {
     /// 显示一个从底部弹起的半模态视图
     ///
     /// 内部会创建一个UIViewController并将contentView添加到该控制器的view上,并添加`距离父视图上下左右均为0`的约束.
-    /// 如果需要手动关闭Popover,则`谁弹出谁负责关闭`,即`self.presentedViewController?.dismiss(animated: true, completion: nil)`
+    /// 如果需要手动关闭模态窗口,则`谁弹出谁负责关闭`,即`self.presentedViewController?.dismiss(animated: true, completion: nil)`
     ///
     /// - Parameters:
     ///   - contentView:            模态视图
