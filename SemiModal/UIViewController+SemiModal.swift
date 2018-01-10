@@ -116,6 +116,12 @@ private class SemiModalAnimatedTransitioning: NSObject, UIViewControllerAnimated
         
         if isPresentation, let toView = toView {
             transitionContext.containerView.addSubview(toView)
+            toView.layer.shadowColor = UIColor.black.cgColor
+            toView.layer.shadowOffset = CGSize(width: 0.0, height: -3.0)
+            toView.layer.shadowRadius = 5.0
+            toView.layer.shadowOpacity = 0.8
+            toView.layer.shouldRasterize = true
+            toView.layer.rasterizationScale = UIScreen.main.scale
         }
         
         let animatingVC = isPresentation ? toVC : fromVC
@@ -139,7 +145,7 @@ private class SemiModalPresentationController: UIPresentationController {
     var isShouldDismissPopover = true
     private let scale: CGFloat = 0.8
     private var animatingView: UIView?
-    private lazy var dimmingView: UIView = {
+    private lazy var bakcgroundView: UIView = {
         let view = UIView()
         view.backgroundColor = .black
         return view
@@ -149,13 +155,13 @@ private class SemiModalPresentationController: UIPresentationController {
         super.init(presentedViewController: presentedViewController, presenting: presentingViewController)
         
         let tap = UITapGestureRecognizer(target: self, action: #selector(tapGestureRecognizerAction(_:)))
-        dimmingView.addGestureRecognizer(tap)
+        bakcgroundView.addGestureRecognizer(tap)
 
         if let window = UIApplication.shared.keyWindow,
             let snapshotView = window.snapshotView(afterScreenUpdates: true) {
             let views = ["view": snapshotView]
             animatingView = snapshotView
-            dimmingView.addSubview(snapshotView)
+            bakcgroundView.addSubview(snapshotView)
             snapshotView.translatesAutoresizingMaskIntoConstraints = false
             NSLayoutConstraint.activate(NSLayoutConstraint.constraints(withVisualFormat: "H:|[view]|", options: .directionLeadingToTrailing, metrics: nil, views: views))
             NSLayoutConstraint.activate(NSLayoutConstraint.constraints(withVisualFormat: "V:|[view]|", options: .directionLeadingToTrailing, metrics: nil, views: views))
@@ -177,13 +183,13 @@ private class SemiModalPresentationController: UIPresentationController {
     
     override func containerViewWillLayoutSubviews() {
         super.containerViewWillLayoutSubviews()
-        dimmingView.frame = containerView?.bounds ?? .zero
+        bakcgroundView.frame = containerView?.bounds ?? .zero
         presentedView?.frame = frameOfPresentedViewInContainerView
     }
     
     override func presentationTransitionWillBegin() {
         super.presentationTransitionWillBegin()
-        containerView?.addSubview(dimmingView)
+        containerView?.addSubview(bakcgroundView)
         let animation = backgroundTranslateAnimation(true)
         presentedViewController.transitionCoordinator?.animate(alongsideTransition: { (_) in
             self.animatingView?.layer.add(animation, forKey: nil)
