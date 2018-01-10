@@ -21,7 +21,7 @@
 
 ## 用法
 
-- 将`SemiModal`文件夹拖入你的项目即可
+- 将`SemiModal`文件夹拖入你的项目并导入`#import "UIViewController+XPSemiModal.h"`即可
 
 - 示例代码
 
