@@ -145,9 +145,15 @@ private class SemiModalPresentationController: UIPresentationController {
     var isShouldDismissPopover = true
     private let scale: CGFloat = 0.8
     private var animatingView: UIView?
-    private lazy var bakcgroundView: UIView = {
+    private lazy var backgroundView: UIView = {
         let view = UIView()
         view.backgroundColor = .black
+        view.isUserInteractionEnabled = false
+        return view
+    }()
+    private lazy var dimmingView: UIView = {
+        let view = UIView()
+        view.backgroundColor = UIColor(white: 0.0, alpha: 0.3)
         return view
     }()
     
@@ -155,13 +161,13 @@ private class SemiModalPresentationController: UIPresentationController {
         super.init(presentedViewController: presentedViewController, presenting: presentingViewController)
         
         let tap = UITapGestureRecognizer(target: self, action: #selector(tapGestureRecognizerAction(_:)))
-        bakcgroundView.addGestureRecognizer(tap)
+        dimmingView.addGestureRecognizer(tap)
 
         if let window = UIApplication.shared.keyWindow,
             let snapshotView = window.snapshotView(afterScreenUpdates: true) {
             let views = ["view": snapshotView]
             animatingView = snapshotView
-            bakcgroundView.addSubview(snapshotView)
+            backgroundView.addSubview(snapshotView)
             snapshotView.translatesAutoresizingMaskIntoConstraints = false
             NSLayoutConstraint.activate(NSLayoutConstraint.constraints(withVisualFormat: "H:|[view]|", options: .directionLeadingToTrailing, metrics: nil, views: views))
             NSLayoutConstraint.activate(NSLayoutConstraint.constraints(withVisualFormat: "V:|[view]|", options: .directionLeadingToTrailing, metrics: nil, views: views))
@@ -183,15 +189,19 @@ private class SemiModalPresentationController: UIPresentationController {
     
     override func containerViewWillLayoutSubviews() {
         super.containerViewWillLayoutSubviews()
-        bakcgroundView.frame = containerView?.bounds ?? .zero
+        backgroundView.frame = containerView?.bounds ?? .zero
+        dimmingView.frame = backgroundView.bounds
         presentedView?.frame = frameOfPresentedViewInContainerView
     }
     
     override func presentationTransitionWillBegin() {
         super.presentationTransitionWillBegin()
-        containerView?.addSubview(bakcgroundView)
+        containerView?.addSubview(backgroundView)
+        containerView?.addSubview(dimmingView)
         let animation = backgroundTranslateAnimation(true)
+        dimmingView.alpha = 0.0
         presentedViewController.transitionCoordinator?.animate(alongsideTransition: { (_) in
+            self.dimmingView.alpha = 1.0
             self.animatingView?.layer.add(animation, forKey: nil)
         }, completion: nil)
     }
@@ -200,6 +210,7 @@ private class SemiModalPresentationController: UIPresentationController {
         super.dismissalTransitionWillBegin()
         let animation = backgroundTranslateAnimation(false)
         presentedViewController.transitionCoordinator?.animate(alongsideTransition: { (_) in
+            self.dimmingView.alpha = 0.0
             self.animatingView?.layer.add(animation, forKey: nil)
         }, completion: nil)
     }
