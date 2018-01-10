@@ -22,6 +22,7 @@
 }
 
 - (void)presentSemiModalViewController:(UIViewController *)contentViewController contentHeight:(CGFloat)contentHeight shouldDismissPopover:(BOOL)shouldDismissPopover completion:(void (^)(void))completion {
+    if (self.presentedViewController) { return; }
     contentViewController.modalPresentationStyle = UIModalPresentationCustom;
     contentViewController.preferredContentSize = CGSizeMake(0.0, contentHeight);
     
