@@ -21,16 +21,17 @@ class ViewController: UIViewController {
     }
 
     @IBAction func buttonAction(_ sender: UIButton) {
-//        let storyboard = UIStoryboard(name: "Main", bundle: nil)
-//        let vc = storyboard.instantiateViewController(withIdentifier: "ContentViewController")
-//        presentSemiModalViewController(vc, contentHeight: 300.0, shouldDismissPopover: true, completion: nil)
-        let contentView = UIView()
-        contentView.backgroundColor = .purple
-        presentSemiModalView(contentView, contentHeight: 300.0, shouldDismissPopover: false) {
-            DispatchQueue.main.asyncAfter(deadline: .now()+3.0, execute: {
-                self.presentedViewController?.dismiss(animated: true, completion: nil)
-            })
-        }
+        let storyboard = UIStoryboard(name: "Main", bundle: nil)
+        let vc = storyboard.instantiateViewController(withIdentifier: "ContentViewController")
+        presentSemiModalViewController(vc, contentHeight: 300.0, shouldDismissPopover: true, completion: nil)
+        
+//        let contentView = UIView()
+//        contentView.backgroundColor = .purple
+//        presentSemiModalView(contentView, contentHeight: 300.0, shouldDismissPopover: false) {
+//            DispatchQueue.main.asyncAfter(deadline: .now()+3.0, execute: {
+//                self.presentedViewController?.dismiss(animated: true, completion: nil)
+//            })
+//        }
     }
     
 }
