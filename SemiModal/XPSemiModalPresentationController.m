@@ -10,8 +10,9 @@
 
 @interface XPSemiModalPresentationController ()
 
-@property (nonatomic, strong) UIView *dimmingView;
+@property (nonatomic, strong) UIView *backgroundView;
 @property (nonatomic, strong) UIView *animatingView;
+@property (nonatomic, strong) UIView *dimmingView;
 
 @end
 
@@ -22,8 +23,10 @@
     if (self) {
         _shouldDismissPopover = YES;
         
+        _backgroundView = [[UIView alloc] init];
+        _backgroundView.backgroundColor = [UIColor blackColor];
         _dimmingView = [[UIView alloc] init];
-        _dimmingView.backgroundColor = [UIColor blackColor];
+        _dimmingView.backgroundColor = [UIColor colorWithWhite:0.0 alpha:0.3];
         UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tapGestureRecognizerAction:)];
         [_dimmingView addGestureRecognizer:tap];
         
@@ -32,7 +35,7 @@
         NSAssert(window, @"UIApplication.sharedApplication.keyWindow is nil");
         if (snapshotView) {
             _animatingView = snapshotView;
-            [_dimmingView addSubview:snapshotView];
+            [_backgroundView addSubview:snapshotView];
             snapshotView.translatesAutoresizingMaskIntoConstraints = NO;
             [NSLayoutConstraint activateConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[snapshotView]|" options:0 metrics:nil views:NSDictionaryOfVariableBindings(snapshotView)]];
             [NSLayoutConstraint activateConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[snapshotView]|" options:0 metrics:nil views:NSDictionaryOfVariableBindings(snapshotView)]];
@@ -51,15 +54,19 @@
 
 - (void)containerViewWillLayoutSubviews {
     [super containerViewWillLayoutSubviews];
+    _backgroundView.frame = self.containerView.bounds;
     _dimmingView.frame = self.containerView.bounds;
     self.presentedView.frame = [self frameOfPresentedViewInContainerView];
 }
 
 - (void)presentationTransitionWillBegin {
     [super presentationTransitionWillBegin];
+    [self.containerView addSubview:_backgroundView];
     [self.containerView addSubview:_dimmingView];
+    _dimmingView.alpha = 0.0;
     CAAnimationGroup *animation = [self backgroundTranslateAnimationWithForward:YES];
     [self.presentedViewController.transitionCoordinator animateAlongsideTransition:^(id<UIViewControllerTransitionCoordinatorContext>  _Nonnull context) {
+        self.dimmingView.alpha = 1.0;
         [self.animatingView.layer addAnimation:animation forKey:nil];
     } completion:nil];
 }
@@ -68,6 +75,7 @@
     [super dismissalTransitionWillBegin];
     CAAnimationGroup *animation = [self backgroundTranslateAnimationWithForward:NO];
     [self.presentedViewController.transitionCoordinator animateAlongsideTransition:^(id<UIViewControllerTransitionCoordinatorContext>  _Nonnull context) {
+        self.dimmingView.alpha = 0.0;
         [self.animatingView.layer addAnimation:animation forKey:nil];
     } completion:nil];
 }

@@ -24,6 +24,13 @@
 
     if (isPresentation) {
         [transitionContext.containerView addSubview:toView];
+        // Add shadow effect.
+        toView.layer.shadowColor = [[UIColor blackColor] CGColor];
+        toView.layer.shadowOffset = CGSizeMake(0.0, -3.0);
+        toView.layer.shadowRadius = 5.0;
+        toView.layer.shadowOpacity = 0.8;
+        toView.layer.shouldRasterize = YES;
+        toView.layer.rasterizationScale = [[UIScreen mainScreen] scale];
     }
     UIViewController *animatingVC = isPresentation ? toVC : fromVC;
     CGRect finalFrame = [transitionContext finalFrameForViewController:animatingVC];
