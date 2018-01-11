@@ -26,10 +26,10 @@ extension UIViewController {
     /// - Parameters:
     ///   - contentViewController:  模态视图控制器
     ///   - contentHeight:          模态视图高度
-    ///   - shouldDismissPopover:   点击模态视图之外的区域是否关闭模态窗口
+    ///   - shouldDismissModal:     点击模态视图之外的区域是否关闭模态窗口
     ///   - completion:             模态窗口显示完毕时的回调
     @available(iOS 8.0, *)
-    func presentSemiModalViewController(_ contentViewController: UIViewController, contentHeight: CGFloat, shouldDismissPopover: Bool, completion: (() -> Void)?) {
+    func presentSemiModalViewController(_ contentViewController: UIViewController, contentHeight: CGFloat, shouldDismissModal: Bool, completion: (() -> Void)?) {
         if let _ = presentedViewController { return }
         contentViewController.modalPresentationStyle = .custom
         contentViewController.preferredContentSize = CGSize(width: 0.0, height: contentHeight)
@@ -40,7 +40,7 @@ extension UIViewController {
         contentViewController.strongSemiModalTransitioningDelegate = transitioningDelegate
         
         if let presentationController = contentViewController.presentationController as? SemiModalPresentationController {
-            presentationController.isShouldDismissPopover = shouldDismissPopover
+            presentationController.isShouldDismissModal = shouldDismissModal
         }
         
         present(contentViewController, animated: true, completion: completion)
@@ -55,10 +55,10 @@ extension UIViewController {
     /// - Parameters:
     ///   - contentView:            模态视图
     ///   - contentHeight:          模态视图高度
-    ///   - shouldDismissPopover:   点击模态视图之外的区域是否关闭模态窗口
+    ///   - shouldDismissModal:     点击模态视图之外的区域是否关闭模态窗口
     ///   - completion:             模态窗口显示完毕时的回调
     @available(iOS 8.0, *)
-    func presentSemiModalView(_ contentView: UIView, contentHeight: CGFloat, shouldDismissPopover: Bool, completion: (() -> Void)?) {
+    func presentSemiModalView(_ contentView: UIView, contentHeight: CGFloat, shouldDismissModal: Bool, completion: (() -> Void)?) {
         let contentViewController = UIViewController()
         contentViewController.view.backgroundColor = .clear
         contentViewController.view.addSubview(contentView)
@@ -68,7 +68,7 @@ extension UIViewController {
         NSLayoutConstraint.activate(NSLayoutConstraint.constraints(withVisualFormat: "H:|[contentView]|", options: .directionLeadingToTrailing, metrics: nil, views: views))
         NSLayoutConstraint.activate(NSLayoutConstraint.constraints(withVisualFormat: "V:|[contentView]|", options: .directionLeadingToTrailing, metrics: nil, views: views))
         
-        presentSemiModalViewController(contentViewController, contentHeight: contentHeight, shouldDismissPopover: shouldDismissPopover, completion: completion)
+        presentSemiModalViewController(contentViewController, contentHeight: contentHeight, shouldDismissModal: shouldDismissModal, completion: completion)
     }
     
 }
@@ -142,7 +142,7 @@ private class SemiModalAnimatedTransitioning: NSObject, UIViewControllerAnimated
 
 private class SemiModalPresentationController: UIPresentationController {
     
-    var isShouldDismissPopover = true
+    var isShouldDismissModal = true
     private let scale: CGFloat = 0.8
     private var animatingView: UIView?
     private lazy var backgroundView: UIView = {
@@ -216,7 +216,7 @@ private class SemiModalPresentationController: UIPresentationController {
     }
     
     @objc private func tapGestureRecognizerAction(_ sender: UITapGestureRecognizer) {
-        if isShouldDismissPopover {
+        if isShouldDismissModal {
             presentedViewController.dismiss(animated: true, completion: nil)
         }
     }
