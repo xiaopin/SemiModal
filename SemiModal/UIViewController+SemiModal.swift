@@ -15,12 +15,6 @@ private var key = UnsafeRawPointer(bitPattern: "SemiModalTransitioningDelegate".
 
 extension UIViewController {
     
-    private var strongSemiModalTransitioningDelegate: UIViewControllerTransitioningDelegate? {
-        set { objc_setAssociatedObject(self, &key, newValue, .OBJC_ASSOCIATION_RETAIN_NONATOMIC) }
-        get { return objc_getAssociatedObject(self, &key) as? UIViewControllerTransitioningDelegate }
-    }
-    
-    
     /// 显示一个从底部弹起的半模态视图控制器
     ///
     /// - Parameters:
@@ -37,7 +31,7 @@ extension UIViewController {
         let transitioningDelegate = SemiModalTransitioningDelegate()
         contentViewController.transitioningDelegate = transitioningDelegate
         // Keep strong references.
-        contentViewController.strongSemiModalTransitioningDelegate = transitioningDelegate
+        objc_setAssociatedObject(contentViewController, &key, transitioningDelegate, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
         
         if let presentationController = contentViewController.presentationController as? SemiModalPresentationController {
             presentationController.isShouldDismissModal = shouldDismissModal
@@ -143,7 +137,6 @@ private class SemiModalAnimatedTransitioning: NSObject, UIViewControllerAnimated
 private class SemiModalPresentationController: UIPresentationController {
     
     var isShouldDismissModal = true
-    private let scale: CGFloat = 0.8
     private var animatingView: UIView?
     private lazy var backgroundView: UIView = {
         let view = UIView()
@@ -234,7 +227,7 @@ private class SemiModalPresentationController: UIPresentationController {
         var t2 = CATransform3DIdentity
         t2.m34 = t1.m34
         t2 = CATransform3DTranslate(t2, 0.0, presentedViewController.view.frame.size.height * translateFactor, 0.0)
-        t2 = CATransform3DScale(t2, scale, scale, 1.0)
+        t2 = CATransform3DScale(t2, 0.8, 0.8, 1.0)
         
         let animation1 = CABasicAnimation(keyPath: "transform")
         animation1.toValue = NSValue(caTransform3D: t1)
