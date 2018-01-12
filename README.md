@@ -5,7 +5,7 @@
 [![Language](https://img.shields.io/badge/platform-Objective%20C-blue.svg?style=flat)]()
 [![License](https://img.shields.io/badge/license-MIT-orange.svg?style=flat)]()
 
-> 使用者只需关心`UIViewController+XPSemiModal.h`提供的方法即可，无需关心其他文件。如果对该功能实现有兴趣，你可自行查阅其他文件源代码。
+> 使用者只需关心`UIViewController+XPSemiModal.h`提供的使用方法以及`XPSemiModalConfiguration.h`所提供的定制功能即可，无需关心其他文件。如果对该功能实现有兴趣，你可自行查阅其他文件源代码。
 
 类似淘宝添加购物车的模态视图动画
 
@@ -30,7 +30,8 @@
 ```ObjC
 UIViewController *contentViewController = [[UIViewController alloc] init];
 contentViewController.view.backgroundColor = [UIColor lightGrayColor];
-[self presentSemiModalViewController:contentViewController contentHeight:300.0 shouldDismissPopover:YES completion:nil];
+XPSemiModalConfiguration *config = [XPSemiModalConfiguration defaultConfiguration];
+[self presentSemiModalViewController:contentViewController contentHeight:300.0 configuration:config completion:nil];
 ```
 
 2. 弹出自定义视图
@@ -38,7 +39,8 @@ contentViewController.view.backgroundColor = [UIColor lightGrayColor];
 ```ObjC
 UIView *contentView = [[UIView alloc] init];
 contentView.backgroundColor = [UIColor purpleColor];
-[self presentSemiModalView:contentView contentHeight:300.0 shouldDismissPopover:NO completion:^{
+XPSemiModalConfiguration *config = [XPSemiModalConfiguration defaultConfiguration];
+[self presentSemiModalView:contentView contentHeight:300.0 configuration:config completion:^{
 	dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(3 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
 		[self.presentedViewController dismissViewControllerAnimated:YES completion:nil];
 	});
@@ -47,7 +49,11 @@ contentView.backgroundColor = [UIColor purpleColor];
 
 ## 演示
 
-[![](./preview.gif)]()
+[![GIF](./preview.gif)]()
+
+[![1.png](./1.png)]()
+
+[![2.png](./2.png)]()
 
 ## 致谢
 

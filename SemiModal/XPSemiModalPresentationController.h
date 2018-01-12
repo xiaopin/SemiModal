@@ -8,8 +8,10 @@
 
 #import <UIKit/UIKit.h>
 
+@class XPSemiModalConfiguration;
+
 @interface XPSemiModalPresentationController : UIPresentationController
 
-@property (nonatomic, assign, getter=isShouldDismissPopover) BOOL shouldDismissPopover;
+@property (nonatomic, strong) XPSemiModalConfiguration *configuration;
 
 @end

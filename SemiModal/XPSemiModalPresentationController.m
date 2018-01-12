@@ -7,10 +7,11 @@
 //
 
 #import "XPSemiModalPresentationController.h"
+#import "XPSemiModalConfiguration.h"
 
 @interface XPSemiModalPresentationController ()
 
-@property (nonatomic, strong) UIView *backgroundView;
+@property (nonatomic, strong) UIImageView *backgroundView;
 @property (nonatomic, strong) UIView *animatingView;
 @property (nonatomic, strong) UIView *dimmingView;
 
@@ -21,25 +22,13 @@
 - (instancetype)initWithPresentedViewController:(UIViewController *)presentedViewController presentingViewController:(UIViewController *)presentingViewController {
     self = [super initWithPresentedViewController:presentedViewController presentingViewController:presentingViewController];
     if (self) {
-        _shouldDismissPopover = YES;
-        
-        _backgroundView = [[UIView alloc] init];
-        _backgroundView.backgroundColor = [UIColor blackColor];
+        _configuration = [XPSemiModalConfiguration defaultConfiguration];
+        _backgroundView = [[UIImageView alloc] init];
+        _backgroundView.backgroundColor = _configuration.backgroundColor;
         _dimmingView = [[UIView alloc] init];
-        _dimmingView.backgroundColor = [UIColor colorWithWhite:0.0 alpha:0.3];
+        _dimmingView.backgroundColor = [UIColor colorWithWhite:0.0 alpha:_configuration.backgroundOpacity];
         UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tapGestureRecognizerAction:)];
         [_dimmingView addGestureRecognizer:tap];
-        
-        UIWindow *window = [[UIApplication sharedApplication] keyWindow];
-        UIView *snapshotView = [window snapshotViewAfterScreenUpdates:YES];
-        NSAssert(window, @"UIApplication.sharedApplication.keyWindow is nil");
-        if (snapshotView) {
-            _animatingView = snapshotView;
-            [_backgroundView addSubview:snapshotView];
-            snapshotView.translatesAutoresizingMaskIntoConstraints = NO;
-            [NSLayoutConstraint activateConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[snapshotView]|" options:0 metrics:nil views:NSDictionaryOfVariableBindings(snapshotView)]];
-            [NSLayoutConstraint activateConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[snapshotView]|" options:0 metrics:nil views:NSDictionaryOfVariableBindings(snapshotView)]];
-        }
     }
     return self;
 }
@@ -61,27 +50,46 @@
 
 - (void)presentationTransitionWillBegin {
     [super presentationTransitionWillBegin];
-    [self.containerView addSubview:_backgroundView];
+    
+    if (_configuration.enableBackgroundAnimation) {
+        UIWindow *window = [[UIApplication sharedApplication] keyWindow];
+        UIView *snapshotView = [window snapshotViewAfterScreenUpdates:YES];
+        NSAssert(window, @"UIApplication.sharedApplication.keyWindow is nil");
+        if (snapshotView) {
+            _animatingView = snapshotView;
+            [_backgroundView addSubview:snapshotView];
+            snapshotView.translatesAutoresizingMaskIntoConstraints = NO;
+            [NSLayoutConstraint activateConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[snapshotView]|" options:0 metrics:nil views:NSDictionaryOfVariableBindings(snapshotView)]];
+            [NSLayoutConstraint activateConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[snapshotView]|" options:0 metrics:nil views:NSDictionaryOfVariableBindings(snapshotView)]];
+        }
+        [self.containerView addSubview:_backgroundView];
+    }
+    
     [self.containerView addSubview:_dimmingView];
     _dimmingView.alpha = 0.0;
-    CAAnimationGroup *animation = [self backgroundTranslateAnimationWithForward:YES];
+    
     [self.presentedViewController.transitionCoordinator animateAlongsideTransition:^(id<UIViewControllerTransitionCoordinatorContext>  _Nonnull context) {
         self.dimmingView.alpha = 1.0;
-        [self.animatingView.layer addAnimation:animation forKey:nil];
+        if (self.configuration.enableBackgroundAnimation) {
+            CAAnimationGroup *animation = [self backgroundTranslateAnimationWithForward:YES];
+            [self.animatingView.layer addAnimation:animation forKey:nil];
+        }
     } completion:nil];
 }
 
 - (void)dismissalTransitionWillBegin {
     [super dismissalTransitionWillBegin];
-    CAAnimationGroup *animation = [self backgroundTranslateAnimationWithForward:NO];
     [self.presentedViewController.transitionCoordinator animateAlongsideTransition:^(id<UIViewControllerTransitionCoordinatorContext>  _Nonnull context) {
         self.dimmingView.alpha = 0.0;
-        [self.animatingView.layer addAnimation:animation forKey:nil];
+        if (self.configuration.enableBackgroundAnimation) {
+            CAAnimationGroup *animation = [self backgroundTranslateAnimationWithForward:NO];
+            [self.animatingView.layer addAnimation:animation forKey:nil];
+        }
     } completion:nil];
 }
 
 - (void)tapGestureRecognizerAction:(UITapGestureRecognizer *)sender {
-    if (_shouldDismissPopover) {
+    if (_configuration.shouldDismissModal) {
         [self.presentedViewController dismissViewControllerAnimated:YES completion:nil];
     }
 }
@@ -123,6 +131,14 @@
     group.duration = animationDuration;
     group.animations = @[animation1, animation2];
     return group;
+}
+
+- (void)setConfiguration:(XPSemiModalConfiguration *)configuration {
+    NSAssert(configuration, @"The configuration can't be nil.");
+    _configuration = configuration;
+    _backgroundView.backgroundColor = configuration.backgroundColor;
+    _backgroundView.image = configuration.backgroundImage;
+    _dimmingView.backgroundColor = [UIColor colorWithWhite:0.0 alpha:configuration.backgroundOpacity];
 }
 
 @end

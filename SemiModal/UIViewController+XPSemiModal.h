@@ -7,11 +7,9 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "XPSemiModalConfiguration.h"
 
 @interface UIViewController (XPSemiModal)
-
-// 仅限内部使用(请直接无视该属性😊)
-@property (nonatomic, strong) id<UIViewControllerTransitioningDelegate> strongSemiModalTransitioningDelegate;
 
 
 /**
@@ -19,10 +17,10 @@
 
  @param contentViewController   模态视图控制器
  @param contentHeight           模态视图高度
- @param shouldDismissPopover    点击模态视图之外的区域是否关闭模态窗口
+ @param configuration           模态窗口配置信息
  @param completion              模态窗口显示完毕时的回调
  */
-- (void)presentSemiModalViewController:(UIViewController *)contentViewController contentHeight:(CGFloat)contentHeight shouldDismissPopover:(BOOL)shouldDismissPopover completion:(void (^)(void))completion NS_AVAILABLE_IOS(8_0);
+- (void)presentSemiModalViewController:(UIViewController *)contentViewController contentHeight:(CGFloat)contentHeight configuration:(XPSemiModalConfiguration *)configuration completion:(void (^)(void))completion NS_AVAILABLE_IOS(8_0);
 
 
 /**
@@ -33,9 +31,9 @@
 
  @param contentView             模态内容视图
  @param contentHeight           模态视图高度
- @param shouldDismissPopover    点击模态视图之外的区域是否关闭模态窗口
+ @param configuration           模态窗口配置信息
  @param completion              模态窗口显示完毕时的回调
  */
-- (void)presentSemiModalView:(UIView *)contentView contentHeight:(CGFloat)contentHeight shouldDismissPopover:(BOOL)shouldDismissPopover completion:(void (^)(void))completion NS_AVAILABLE_IOS(8_0);
+- (void)presentSemiModalView:(UIView *)contentView contentHeight:(CGFloat)contentHeight configuration:(XPSemiModalConfiguration *)configuration completion:(void (^)(void))completion NS_AVAILABLE_IOS(8_0);
 
 @end

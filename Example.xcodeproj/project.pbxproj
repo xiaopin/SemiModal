@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		121E5E8B2008433800C8990F /* XPSemiModalConfiguration.m in Sources */ = {isa = PBXBuildFile; fileRef = 121E5E8A2008433800C8990F /* XPSemiModalConfiguration.m */; };
 		1228ED922005EE0D00E1F7E7 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 1228ED912005EE0D00E1F7E7 /* AppDelegate.m */; };
 		1228ED982005EE0D00E1F7E7 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 1228ED962005EE0D00E1F7E7 /* Main.storyboard */; };
 		1228ED9A2005EE0D00E1F7E7 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1228ED992005EE0D00E1F7E7 /* Assets.xcassets */; };
@@ -21,6 +22,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		121E5E892008433800C8990F /* XPSemiModalConfiguration.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = XPSemiModalConfiguration.h; sourceTree = "<group>"; };
+		121E5E8A2008433800C8990F /* XPSemiModalConfiguration.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = XPSemiModalConfiguration.m; sourceTree = "<group>"; };
 		1228ED8D2005EE0D00E1F7E7 /* Example.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Example.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1228ED902005EE0D00E1F7E7 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		1228ED912005EE0D00E1F7E7 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -94,12 +97,14 @@
 			children = (
 				1228EDAA2005F02600E1F7E7 /* UIViewController+XPSemiModal.h */,
 				1228EDAB2005F02600E1F7E7 /* UIViewController+XPSemiModal.m */,
-				1228EDB32005F25300E1F7E7 /* XPSemiModalTransitioningDelegate.h */,
-				1228EDB42005F25300E1F7E7 /* XPSemiModalTransitioningDelegate.m */,
+				121E5E892008433800C8990F /* XPSemiModalConfiguration.h */,
+				121E5E8A2008433800C8990F /* XPSemiModalConfiguration.m */,
 				1228EDB62005F26400E1F7E7 /* XPSemiModalAnimatedTransitioning.h */,
 				1228EDB72005F26400E1F7E7 /* XPSemiModalAnimatedTransitioning.m */,
 				1228EDB92005F27E00E1F7E7 /* XPSemiModalPresentationController.h */,
 				1228EDBA2005F27E00E1F7E7 /* XPSemiModalPresentationController.m */,
+				1228EDB32005F25300E1F7E7 /* XPSemiModalTransitioningDelegate.h */,
+				1228EDB42005F25300E1F7E7 /* XPSemiModalTransitioningDelegate.m */,
 			);
 			path = SemiModal;
 			sourceTree = SOURCE_ROOT;
@@ -178,6 +183,7 @@
 				1228EDAC2005F02600E1F7E7 /* UIViewController+XPSemiModal.m in Sources */,
 				1228EDBB2005F27E00E1F7E7 /* XPSemiModalPresentationController.m in Sources */,
 				1228EDA02005EE0D00E1F7E7 /* main.m in Sources */,
+				121E5E8B2008433800C8990F /* XPSemiModalConfiguration.m in Sources */,
 				1228EDB82005F26400E1F7E7 /* XPSemiModalAnimatedTransitioning.m in Sources */,
 				1228EDAF2005F0BD00E1F7E7 /* XPContentViewController.m in Sources */,
 				1228EDB22005F0D800E1F7E7 /* XPRootViewController.m in Sources */,

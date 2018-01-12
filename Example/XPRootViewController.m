@@ -30,12 +30,14 @@
     NSString *identifier = NSStringFromClass([XPContentViewController class]);
     UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
     XPContentViewController *contentViewController = [storyboard instantiateViewControllerWithIdentifier:identifier];
-    [self presentSemiModalViewController:contentViewController contentHeight:300.0 shouldDismissPopover:YES completion:nil];
+    XPSemiModalConfiguration *config = [XPSemiModalConfiguration defaultConfiguration];
+    [self presentSemiModalViewController:contentViewController contentHeight:300.0 configuration:config completion:nil];
     
     
 //    UIView *contentView = [[UIView alloc] init];
 //    contentView.backgroundColor = [UIColor purpleColor];
-//    [self presentSemiModalView:contentView contentHeight:300.0 shouldDismissPopover:NO completion:^{
+//    XPSemiModalConfiguration *config = [XPSemiModalConfiguration defaultConfiguration];
+//    [self presentSemiModalView:contentView contentHeight:300.0 configuration:config completion:^{
 //        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(3 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
 //            [self.presentedViewController dismissViewControllerAnimated:YES completion:nil];
 //        });
