@@ -13,6 +13,39 @@ private var key = UnsafeRawPointer(bitPattern: "SemiModalTransitioningDelegate".
 
 // MARK: - Public API
 
+struct SemiModalConfiguration {
+    
+    /// 点击模态窗口之外的区域是否关闭模态窗口
+    var isShouldDismissModal = true
+    
+    /// 是否使用阴影效果
+    var isEnableShadow = true
+    /// 阴影透明度, 0.0~1.0
+    var shadowOpacity: Float = 0.8
+    /// 阴影圆角
+    var shadowRadius: CGFloat = 5.0
+    
+    /// 是否启用背景动画
+    var isEnableBackgroundAnimation = true
+    /// 背景颜色(需要设置`isEnableBackgroundAnimation`为true)
+    var backgroundColor = UIColor.black
+    /// 背景图片(需要设置`isEnableBackgroundAnimation`为true)
+    var backgroundImage: UIImage?
+    
+    /// 背景透明度, 0.0~1.0
+    var backgroundOpacity: CGFloat = 0.3
+    
+    /// 提供默认配置
+    static var `default`: SemiModalConfiguration {
+        return SemiModalConfiguration()
+    }
+    
+    init() {
+        // Nothing to do.
+    }
+    
+}
+
 extension UIViewController {
     
     /// 显示一个从底部弹起的半模态视图控制器
@@ -20,10 +53,10 @@ extension UIViewController {
     /// - Parameters:
     ///   - contentViewController:  模态视图控制器
     ///   - contentHeight:          模态视图高度
-    ///   - shouldDismissModal:     点击模态视图之外的区域是否关闭模态窗口
+    ///   - configuration:          模态窗口的配置信息
     ///   - completion:             模态窗口显示完毕时的回调
     @available(iOS 8.0, *)
-    func presentSemiModalViewController(_ contentViewController: UIViewController, contentHeight: CGFloat, shouldDismissModal: Bool, completion: (() -> Void)?) {
+    func presentSemiModalViewController(_ contentViewController: UIViewController, contentHeight: CGFloat, configuration: SemiModalConfiguration, completion: (() -> Void)?) {
         if let _ = presentedViewController { return }
         contentViewController.modalPresentationStyle = .custom
         contentViewController.preferredContentSize = CGSize(width: 0.0, height: contentHeight)
@@ -34,7 +67,16 @@ extension UIViewController {
         objc_setAssociatedObject(contentViewController, &key, transitioningDelegate, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
         
         if let presentationController = contentViewController.presentationController as? SemiModalPresentationController {
-            presentationController.isShouldDismissModal = shouldDismissModal
+            presentationController.configuration = configuration
+        }
+        
+        if configuration.isEnableShadow {
+            contentViewController.view.layer.shadowColor = UIColor.black.cgColor
+            contentViewController.view.layer.shadowOffset = CGSize(width: 0.0, height: -3.0)
+            contentViewController.view.layer.shadowRadius = configuration.shadowRadius
+            contentViewController.view.layer.shadowOpacity = configuration.shadowOpacity
+            contentViewController.view.layer.shouldRasterize = true
+            contentViewController.view.layer.rasterizationScale = UIScreen.main.scale
         }
         
         present(contentViewController, animated: true, completion: completion)
@@ -47,12 +89,12 @@ extension UIViewController {
     /// 如果需要手动关闭模态窗口,则`谁弹出谁负责关闭`,即`self.presentedViewController?.dismiss(animated: true, completion: nil)`
     ///
     /// - Parameters:
-    ///   - contentView:            模态视图
-    ///   - contentHeight:          模态视图高度
-    ///   - shouldDismissModal:     点击模态视图之外的区域是否关闭模态窗口
-    ///   - completion:             模态窗口显示完毕时的回调
+    ///   - contentView:    模态视图
+    ///   - contentHeight:  模态视图高度
+    ///   - configuration:  模态窗口配置信息
+    ///   - completion:     模态窗口显示完毕时的回调
     @available(iOS 8.0, *)
-    func presentSemiModalView(_ contentView: UIView, contentHeight: CGFloat, shouldDismissModal: Bool, completion: (() -> Void)?) {
+    func presentSemiModalView(_ contentView: UIView, contentHeight: CGFloat, configuration: SemiModalConfiguration, completion: (() -> Void)?) {
         let contentViewController = UIViewController()
         contentViewController.view.backgroundColor = .clear
         contentViewController.view.addSubview(contentView)
@@ -62,7 +104,7 @@ extension UIViewController {
         NSLayoutConstraint.activate(NSLayoutConstraint.constraints(withVisualFormat: "H:|[contentView]|", options: .directionLeadingToTrailing, metrics: nil, views: views))
         NSLayoutConstraint.activate(NSLayoutConstraint.constraints(withVisualFormat: "V:|[contentView]|", options: .directionLeadingToTrailing, metrics: nil, views: views))
         
-        presentSemiModalViewController(contentViewController, contentHeight: contentHeight, shouldDismissModal: shouldDismissModal, completion: completion)
+        presentSemiModalViewController(contentViewController, contentHeight: contentHeight, configuration: configuration, completion: completion)
     }
     
 }
@@ -110,12 +152,6 @@ private class SemiModalAnimatedTransitioning: NSObject, UIViewControllerAnimated
         
         if isPresentation, let toView = toView {
             transitionContext.containerView.addSubview(toView)
-            toView.layer.shadowColor = UIColor.black.cgColor
-            toView.layer.shadowOffset = CGSize(width: 0.0, height: -3.0)
-            toView.layer.shadowRadius = 5.0
-            toView.layer.shadowOpacity = 0.8
-            toView.layer.shouldRasterize = true
-            toView.layer.rasterizationScale = UIScreen.main.scale
         }
         
         let animatingVC = isPresentation ? toVC : fromVC
@@ -136,35 +172,22 @@ private class SemiModalAnimatedTransitioning: NSObject, UIViewControllerAnimated
 
 private class SemiModalPresentationController: UIPresentationController {
     
-    var isShouldDismissModal = true
+    var configuration = SemiModalConfiguration.default {
+        didSet {
+            backgroundView.backgroundColor = configuration.backgroundColor
+            backgroundView.image = configuration.backgroundImage
+            dimmingView.backgroundColor = UIColor(white: 0.0, alpha: configuration.backgroundOpacity)
+        }
+    }
     private var animatingView: UIView?
-    private lazy var backgroundView: UIView = {
-        let view = UIView()
-        view.backgroundColor = .black
-        view.isUserInteractionEnabled = false
-        return view
-    }()
-    private lazy var dimmingView: UIView = {
-        let view = UIView()
-        view.backgroundColor = UIColor(white: 0.0, alpha: 0.3)
-        return view
-    }()
+    private let backgroundView = UIImageView()
+    private let dimmingView = UIView()
     
     override init(presentedViewController: UIViewController, presenting presentingViewController: UIViewController?) {
         super.init(presentedViewController: presentedViewController, presenting: presentingViewController)
         
         let tap = UITapGestureRecognizer(target: self, action: #selector(tapGestureRecognizerAction(_:)))
         dimmingView.addGestureRecognizer(tap)
-
-        if let window = UIApplication.shared.keyWindow,
-            let snapshotView = window.snapshotView(afterScreenUpdates: true) {
-            let views = ["view": snapshotView]
-            animatingView = snapshotView
-            backgroundView.addSubview(snapshotView)
-            snapshotView.translatesAutoresizingMaskIntoConstraints = false
-            NSLayoutConstraint.activate(NSLayoutConstraint.constraints(withVisualFormat: "H:|[view]|", options: .directionLeadingToTrailing, metrics: nil, views: views))
-            NSLayoutConstraint.activate(NSLayoutConstraint.constraints(withVisualFormat: "V:|[view]|", options: .directionLeadingToTrailing, metrics: nil, views: views))
-        }
     }
     
     override var frameOfPresentedViewInContainerView: CGRect {
@@ -183,33 +206,50 @@ private class SemiModalPresentationController: UIPresentationController {
     override func containerViewWillLayoutSubviews() {
         super.containerViewWillLayoutSubviews()
         backgroundView.frame = containerView?.bounds ?? .zero
-        dimmingView.frame = backgroundView.bounds
+        dimmingView.frame = containerView?.bounds ?? .zero
         presentedView?.frame = frameOfPresentedViewInContainerView
     }
     
     override func presentationTransitionWillBegin() {
         super.presentationTransitionWillBegin()
-        containerView?.addSubview(backgroundView)
+        
+        if configuration.isEnableBackgroundAnimation {
+            if let window = UIApplication.shared.keyWindow,
+                let snapshotView = window.snapshotView(afterScreenUpdates: true) {
+                let views = ["view": snapshotView]
+                animatingView = snapshotView
+                backgroundView.addSubview(snapshotView)
+                snapshotView.translatesAutoresizingMaskIntoConstraints = false
+                NSLayoutConstraint.activate(NSLayoutConstraint.constraints(withVisualFormat: "H:|[view]|", options: .directionLeadingToTrailing, metrics: nil, views: views))
+                NSLayoutConstraint.activate(NSLayoutConstraint.constraints(withVisualFormat: "V:|[view]|", options: .directionLeadingToTrailing, metrics: nil, views: views))
+            }
+            containerView?.addSubview(backgroundView)
+        }
         containerView?.addSubview(dimmingView)
-        let animation = backgroundTranslateAnimation(true)
         dimmingView.alpha = 0.0
+        
         presentedViewController.transitionCoordinator?.animate(alongsideTransition: { (_) in
             self.dimmingView.alpha = 1.0
-            self.animatingView?.layer.add(animation, forKey: nil)
+            if self.configuration.isEnableBackgroundAnimation {
+                let animation = self.backgroundTranslateAnimation(true)
+                self.animatingView?.layer.add(animation, forKey: nil)
+            }
         }, completion: nil)
     }
     
     override func dismissalTransitionWillBegin() {
         super.dismissalTransitionWillBegin()
-        let animation = backgroundTranslateAnimation(false)
         presentedViewController.transitionCoordinator?.animate(alongsideTransition: { (_) in
             self.dimmingView.alpha = 0.0
-            self.animatingView?.layer.add(animation, forKey: nil)
+            if self.configuration.isEnableBackgroundAnimation {
+                let animation = self.backgroundTranslateAnimation(false)
+                self.animatingView?.layer.add(animation, forKey: nil)
+            }
         }, completion: nil)
     }
     
     @objc private func tapGestureRecognizerAction(_ sender: UITapGestureRecognizer) {
-        if isShouldDismissModal {
+        if configuration.isShouldDismissModal {
             presentedViewController.dismiss(animated: true, completion: nil)
         }
     }

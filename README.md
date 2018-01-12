@@ -29,7 +29,7 @@
 ```Swift
 let contentViewController = UIViewController()
 contentViewController.view.backgroundColor = .purple
-presentSemiModalViewController(contentViewController, contentHeight: 300.0, shouldDismissModal: true, completion: nil)
+presentSemiModalViewController(vc, contentHeight: 300.0, configuration: .default, completion: nil)
 ```
 
 2. 弹出自定义视图
@@ -37,7 +37,7 @@ presentSemiModalViewController(contentViewController, contentHeight: 300.0, shou
 ```Swift
 let contentView = UIView()
 contentView.backgroundColor = .purple
-presentSemiModalView(contentView, contentHeight: 300.0, shouldDismissModal: false) {
+presentSemiModalView(contentView, contentHeight: 300.0, configuration: .default) {
 	// 3s后自动关闭
 	DispatchQueue.main.asyncAfter(deadline: .now()+3.0, execute: {
 		self.presentedViewController?.dismiss(animated: true, completion: nil)
@@ -47,7 +47,11 @@ presentSemiModalView(contentView, contentHeight: 300.0, shouldDismissModal: fals
 
 ## 演示
 
-[![](./preview.gif)]()
+[![GIF](./preview.gif)]()
+
+[![1](./1.png)]()
+
+[![2](./2.png)]()
 
 ## 致谢
 
