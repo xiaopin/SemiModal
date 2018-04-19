@@ -5,6 +5,8 @@
 [![Language](https://img.shields.io/badge/platform-Objective%20C-blue.svg?style=flat)]()
 [![License](https://img.shields.io/badge/license-MIT-orange.svg?style=flat)]()
 
+# 该项目已废弃不再维护，请移步 [`iOS-Modal`](https://github.com/xiaopin/iOS-Modal.git)
+
 > 使用者只需关心`UIViewController+XPSemiModal.h`提供的使用方法以及`XPSemiModalConfiguration.h`所提供的定制功能即可，无需关心其他文件。如果对该功能实现有兴趣，你可自行查阅其他文件源代码。
 
 类似淘宝添加购物车的模态视图动画
